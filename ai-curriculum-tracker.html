@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Mastery Curriculum — Real Estate Investment Track</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+  :root {
+    --bg: #0f0e0c;
+    --surface: #171613;
+    --surface2: #1e1c18;
+    --border: #2a2720;
+    --gold: #c9a84c;
+    --gold-dim: #7a6430;
+    --gold-glow: rgba(201,168,76,0.12);
+    --cream: #e8e0ce;
+    --muted: #6b6355;
+    --text: #d4cab8;
+    --green: #4a7c59;
+    --green-bright: #6dba85;
+    --amber: #c97a2a;
+    --red-dim: #5c2e2e;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+    padding: 0 0 80px 0;
+  }
+
+  /* HEADER */
+  .header {
+    border-bottom: 1px solid var(--border);
+    padding: 36px 48px 28px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -60px; left: -40px;
+    width: 300px; height: 200px;
+    background: radial-gradient(ellipse, rgba(201,168,76,0.07) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .header-left h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2rem;
+    color: var(--cream);
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+  .header-left h1 em {
+    color: var(--gold);
+    font-style: italic;
+  }
+  .header-left .subtitle {
+    margin-top: 6px;
+    font-size: 0.78rem;
+    color: var(--muted);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-family: 'DM Mono', monospace;
+  }
+  .header-right {
+    text-align: right;
+  }
+  .overall-pct {
+    font-family: 'DM Serif Display', serif;
+    font-size: 3rem;
+    color: var(--gold);
+    line-height: 1;
+  }
+  .overall-label {
+    font-size: 0.72rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-family: 'DM Mono', monospace;
+    margin-top: 4px;
+  }
+
+  /* PROGRESS BAR GLOBAL */
+  .global-bar-wrap {
+    padding: 0 48px;
+    margin: 24px 0 0;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 24px;
+  }
+  .global-bar {
+    height: 3px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .global-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold-dim), var(--gold));
+    border-radius: 2px;
+    transition: width 0.8s cubic-bezier(0.16,1,0.3,1);
+  }
+  .global-bar-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+  }
+
+  /* PHASE NAV */
+  .phase-nav {
+    display: flex;
+    gap: 0;
+    padding: 0 48px;
+    margin: 32px 0 0;
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+  }
+  .phase-tab {
+    padding: 10px 20px 12px;
+    cursor: pointer;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    transition: all 0.2s;
+    user-select: none;
+  }
+  .phase-tab:hover { color: var(--cream); }
+  .phase-tab.active {
+    color: var(--gold);
+    border-bottom-color: var(--gold);
+  }
+
+  /* MAIN CONTENT */
+  .content {
+    padding: 36px 48px 0;
+  }
+
+  /* PHASE PANEL */
+  .phase-panel { display: none; }
+  .phase-panel.active { display: block; }
+
+  .phase-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 28px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .phase-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.5rem;
+    color: var(--cream);
+  }
+  .phase-meta {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--muted);
+    margin-top: 4px;
+    letter-spacing: 0.06em;
+  }
+  .phase-progress-pill {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 8px 16px;
+    text-align: center;
+    min-width: 80px;
+  }
+  .phase-progress-pill .num {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.4rem;
+    color: var(--gold);
+  }
+  .phase-progress-pill .lbl {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.64rem;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  /* TRACK */
+  .track {
+    margin-bottom: 32px;
+  }
+  .track-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .track-icon {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    border: 1px solid var(--gold-dim);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.7rem;
+    color: var(--gold);
+    font-family: 'DM Mono', monospace;
+    flex-shrink: 0;
+  }
+  .track-name {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--cream);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .track-bar {
+    height: 2px;
+    background: var(--border);
+    flex: 1;
+    border-radius: 1px;
+    overflow: hidden;
+  }
+  .track-bar-fill {
+    height: 100%;
+    background: var(--gold-dim);
+    border-radius: 1px;
+    transition: width 0.6s cubic-bezier(0.16,1,0.3,1);
+  }
+  .track-pct {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+    min-width: 32px;
+    text-align: right;
+  }
+
+  /* MILESTONES */
+  .milestones {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-left: 40px;
+  }
+  .milestone {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 16px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--surface);
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+  .milestone:hover {
+    border-color: var(--gold-dim);
+    background: var(--surface2);
+  }
+  .milestone.done {
+    border-color: #2a3d2e;
+    background: #121a14;
+  }
+  .milestone.done:hover {
+    border-color: var(--green);
+  }
+  .milestone-check {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    border: 1px solid var(--muted);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+    transition: all 0.2s;
+    font-size: 0.65rem;
+  }
+  .milestone.done .milestone-check {
+    background: var(--green);
+    border-color: var(--green);
+    color: #fff;
+  }
+  .milestone-body { flex: 1; }
+  .milestone-title {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--cream);
+    line-height: 1.3;
+  }
+  .milestone.done .milestone-title {
+    color: var(--muted);
+    text-decoration: line-through;
+    text-decoration-color: var(--green-bright);
+  }
+  .milestone-desc {
+    font-size: 0.75rem;
+    color: var(--muted);
+    margin-top: 3px;
+    line-height: 1.5;
+  }
+  .milestone-tags {
+    display: flex;
+    gap: 6px;
+    margin-top: 6px;
+    flex-wrap: wrap;
+  }
+  .tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    padding: 2px 7px;
+    border-radius: 3px;
+    background: var(--surface2);
+    color: var(--muted);
+    border: 1px solid var(--border);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .tag.gold { color: var(--gold); border-color: var(--gold-dim); }
+  .tag.green { color: var(--green-bright); border-color: #2a3d2e; }
+  .milestone-date {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  /* NOTES AREA */
+  .notes-area {
+    margin-top: 6px;
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.73rem;
+    padding: 8px 10px;
+    resize: vertical;
+    min-height: 52px;
+    outline: none;
+    transition: border-color 0.2s;
+    display: none;
+  }
+  .notes-area:focus { border-color: var(--gold-dim); }
+  .notes-area.show { display: block; }
+  .note-toggle {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--muted);
+    cursor: pointer;
+    margin-top: 4px;
+    letter-spacing: 0.06em;
+    background: none; border: none;
+    padding: 0;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .note-toggle:hover { color: var(--gold); }
+
+  /* COMPLETED DATE badge */
+  .done-badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    color: var(--green-bright);
+    background: #1a2d1e;
+    border: 1px solid #2a3d2e;
+    border-radius: 3px;
+    padding: 2px 8px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  /* STATS BAR */
+  .stats-bar {
+    display: flex;
+    gap: 0;
+    padding: 0 48px;
+    margin: 28px 0 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .stat {
+    padding: 16px 24px;
+    border-right: 1px solid var(--border);
+    flex: 1;
+    text-align: center;
+  }
+  .stat:last-child { border-right: none; }
+  .stat-num {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.6rem;
+    color: var(--cream);
+  }
+  .stat-lbl {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 640px) {
+    .header { padding: 24px 20px 20px; flex-direction: column; align-items: flex-start; gap: 12px; }
+    .global-bar-wrap, .phase-nav, .content { padding-left: 20px; padding-right: 20px; }
+    .stats-bar { padding: 0 20px; }
+    .milestones { padding-left: 0; }
+  }
+
+  /* ANIMATIONS */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .phase-panel.active { animation: fadeIn 0.3s ease; }
+
+  /* TOOLTIP for instructions */
+  .hint {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--muted);
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 6px 12px;
+    margin-bottom: 20px;
+  }
+  .hint span { color: var(--gold); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <h1>AI Mastery — <em>RE Investment Track</em></h1>
+    <div class="subtitle">Personal Learning Curriculum · 12-Month Program</div>
+  </div>
+  <div class="header-right">
+    <div class="overall-pct" id="overall-pct">0%</div>
+    <div class="overall-label">Overall Complete</div>
+  </div>
+</div>
+
+<div class="global-bar-wrap">
+  <div class="global-bar"><div class="global-bar-fill" id="global-bar-fill" style="width:0%"></div></div>
+  <div class="global-bar-labels">
+    <span id="completed-count">0 milestones completed</span>
+    <span id="remaining-count">0 remaining</span>
+  </div>
+</div>
+
+<div class="stats-bar">
+  <div class="stat"><div class="stat-num" id="stat-done">0</div><div class="stat-lbl">Done</div></div>
+  <div class="stat"><div class="stat-num" id="stat-total">0</div><div class="stat-lbl">Total</div></div>
+  <div class="stat"><div class="stat-num" id="stat-phase">—</div><div class="stat-lbl">Current Phase</div></div>
+  <div class="stat"><div class="stat-num" id="stat-streak">0</div><div class="stat-lbl">This Month</div></div>
+</div>
+
+<nav class="phase-nav">
+  <div class="phase-tab active" data-phase="0">Phase 1 · Foundation</div>
+  <div class="phase-tab" data-phase="1">Phase 2 · Application</div>
+  <div class="phase-tab" data-phase="2">Phase 3 · Leadership</div>
+  <div class="phase-tab" data-phase="3">All Milestones</div>
+</nav>
+
+<div class="content" id="content"></div>
+
+<script>
+const CURRICULUM = [
+  {
+    phase: 0,
+    phaseTitle: "Phase 1 — Foundation",
+    phaseMeta: "Months 1–3 · Build personal fluency before touching firm workflows",
+    tracks: [
+      {
+        id: "T1", icon: "P", name: "Prompt Engineering",
+        milestones: [
+          { id: "m1", title: "Complete a structured prompt engineering course or guide", desc: "Anthropic's prompting docs, Learnprompting.org, or DeepLearning.AI short course. Focus on chain-of-thought, role prompting, and structured output.", tags: ["skill", "free"], est: "Week 1" },
+          { id: "m2", title: "Use AI to draft 3 real IC memos or investment summaries", desc: "Take actual deals from your pipeline. Use Claude to draft narrative sections; compare quality to your own. Track where it helps and where it fails.", tags: ["applied", "RE"], est: "Weeks 2–3" },
+          { id: "m3", title: "Build a personal prompt library for RE use cases", desc: "20+ saved prompts covering: OM summarization, LP update drafts, covenant analysis, variance commentary, exec summary generation.", tags: ["deliverable", "RE"], est: "Month 1–2" },
+          { id: "m4", title: "Summarize 5 OM/deal documents using AI document analysis", desc: "Drop PDFs into Claude and extract: asset type, price, NOI, tenant schedule, debt terms, key risks. Evaluate accuracy against source.", tags: ["applied", "RE"], est: "Month 2" },
+        ]
+      },
+      {
+        id: "T2", icon: "Py", name: "Python for Data Work",
+        milestones: [
+          { id: "m5a", title: "Set up your Python environment", desc: "Install Python and VS Code, run your first 'hello world' script. This friction point trips people up early — get it done in a half-day before anything else.", tags: ["skill", "coding"], est: "Week 2" },
+          { id: "m5", title: "Complete 'Python for Everybody' on Coursera (first 3 weeks only)", desc: "Free to audit. Video-first, beginner-friendly. Watch weeks 1–3 only: variables, conditionals, functions. Stop there and start applying — don't try to finish the full specialization first.", tags: ["skill", "coding"], est: "Weeks 2–4" },
+          { id: "m6", title: "Have Claude write a rent roll cleanup script — then run and understand it", desc: "Describe your messy Excel export to Claude, let it write the pandas script, run it yourself, and read through the code to understand what each part does. The goal is reading and editing, not authoring from scratch.", tags: ["applied", "coding", "RE"], est: "Month 2" },
+          { id: "m7", title: "Have Claude automate one recurring Excel report — then modify it", desc: "Pick your most painful monthly report. Claude writes the openpyxl script; you run it, tweak one thing (a column, a filter, a filename), and get comfortable making small edits. That's the 'aha moment'.", tags: ["deliverable", "coding"], est: "Month 2–3" },
+          { id: "m8", title: "Make your first Anthropic API call from a Python script", desc: "Do this as a guided exercise with Claude walking you through each step: get an API key, install the SDK, send a prompt, print the response. Simpler than it sounds once the environment is set up.", tags: ["coding", "api"], est: "Month 3" },
+        ]
+      },
+      {
+        id: "T3", icon: "XL", name: "AI + Excel Mastery",
+        milestones: [
+          { id: "m9", title: "Use AI to write 10 non-trivial Excel formulas you previously built manually", desc: "Complex IFS, XLOOKUP, array formulas, dynamic ranges. Prompt for the formula, test it, understand it. Never Google a formula again.", tags: ["skill", "excel"], est: "Month 1" },
+          { id: "m10", title: "Use AI to write a VBA macro for a recurring task", desc: "Formatting cleanup, report generation, multi-sheet consolidation. Use your existing VBA familiarity to evaluate and edit the output.", tags: ["applied", "excel"], est: "Month 2–3" },
+        ]
+      }
+    ]
+  },
+  {
+    phase: 1,
+    phaseTitle: "Phase 2 — Application",
+    phaseMeta: "Months 3–6 · Build point solutions for your two pain areas",
+    tracks: [
+      {
+        id: "T4", icon: "DS", name: "Deal Sourcing & Underwriting",
+        milestones: [
+          { id: "m11", title: "Build an OM intake workflow: PDF → structured deal data", desc: "Python script or Claude workflow that reads an OM PDF and outputs: price, SF, NOI, cap rate, major tenants, lease terms, debt assumptions into a template.", tags: ["deliverable", "RE", "api"], est: "Month 3–4" },
+          { id: "m12", title: "Create a standardized AI-assisted deal intake template", desc: "Excel or Notion template that the OM intake workflow populates. Includes auto-calculated fields: implied value per SF, debt coverage, yield-on-cost.", tags: ["deliverable", "RE"], est: "Month 4" },
+          { id: "m13", title: "Run 10 real deals through the intake workflow and refine", desc: "Measure accuracy vs. manual review. Track where AI hallucinates or misses. Tune prompts accordingly. Target: 80%+ field accuracy.", tags: ["applied", "RE"], est: "Month 4–5" },
+          { id: "m14", title: "Build a simple deal pipeline tracker (Airtable or Notion + AI entry)", desc: "Fields: source, stage, asset type, market, size, status. Wire in AI-assisted data entry from the intake workflow.", tags: ["deliverable", "RE"], est: "Month 5–6" },
+          { id: "m15", title: "Use AI to generate first-draft IC investment memos from deal data", desc: "Prompt that takes structured deal data + your thesis bullets → outputs a structured IC memo draft. Human edits from there.", tags: ["deliverable", "RE", "api"], est: "Month 6" },
+        ]
+      },
+      {
+        id: "T5", icon: "AC", name: "Entity Accounting & Treasury",
+        milestones: [
+          { id: "m16", title: "Document the retiring director's institutional knowledge", desc: "Use AI to structure and capture: chart of accounts logic, entity mapping, intercompany flow, recurring journal entry descriptions, bank account purposes.", tags: ["critical", "RE"], est: "Month 3–4" },
+          { id: "m17", title: "Build a single-entity consolidation script (start simple)", desc: "Have Claude write a Python script for one entity, one month's trial balance export. Get that working and understood before expanding to multi-entity. AI writes the scaffold; you validate the numbers.", tags: ["deliverable", "coding", "RE"], est: "Month 4–5" },
+          { id: "m18", title: "Automate bank reconciliation variance flagging (one bank first)", desc: "Start with a single bank (whichever exports the cleanest CSV). Have Claude write a script that flags unmatched items vs. your GL. Once it works for one, expand to others.", tags: ["deliverable", "coding", "RE"], est: "Month 5–6" },
+          { id: "m19", title: "Build an AI-assisted LP/investor reporting draft pipeline", desc: "Template + prompt that takes quarterly variance data and outputs narrative commentary for LP reports. Target: 70% of draft written by AI.", tags: ["deliverable", "RE", "api"], est: "Month 5–6" },
+        ]
+      }
+    ]
+  },
+  {
+    phase: 2,
+    phaseTitle: "Phase 3 — Leadership",
+    phaseMeta: "Months 6–12 · Become the firm's AI layer",
+    tracks: [
+      {
+        id: "T6", icon: "AI", name: "Firm-Wide AI Adoption",
+        milestones: [
+          { id: "m20", title: "Write a one-page firm AI policy (data governance basics)", desc: "What can go into consumer AI tools vs. enterprise tools. Cover: LP data, deal data, entity financials, counterparty info. Get CFO sign-off.", tags: ["governance", "leadership"], est: "Month 6–7" },
+          { id: "m21", title: "Run an AI demo session for your investment team", desc: "45-minute session showing 3–4 real use cases. Focus on OM intake, LP draft commentary, and formula writing. Let them try it live.", tags: ["leadership"], est: "Month 7" },
+          { id: "m22", title: "Deploy a shared prompt library the team can use", desc: "SharePoint folder or Notion page with 30+ curated prompts. Organized by function: underwriting, investor relations, accounting, legal review.", tags: ["deliverable", "leadership"], est: "Month 7–8" },
+          { id: "m23", title: "Stand up a document Q&A tool for internal use", desc: "Microsoft Copilot, a SharePoint-based RAG setup, or a lightweight Python tool that lets the team query leases, loan docs, and entity agreements in plain English.", tags: ["deliverable", "coding", "leadership"], est: "Month 8–10" },
+          { id: "m24", title: "Present an AI ROI summary to firm leadership", desc: "Quantify time saved across implemented workflows. Estimate dollar value. Propose 1–2 next investments (tools or hires). Make the business case for continuing.", tags: ["leadership"], est: "Month 10–12" },
+        ]
+      },
+      {
+        id: "T7", icon: "SK", name: "Skill Capstones",
+        milestones: [
+          { id: "m25", title: "Build a Streamlit app that non-technical team members can use", desc: "A simple internal tool: deal intake form, LP commentary generator, or bank account dashboard. Deployed locally or on a free Streamlit Cloud tier.", tags: ["coding", "deliverable"], est: "Month 8–9" },
+          { id: "m26", title: "Complete a short course on RAG or vector search fundamentals", desc: "DeepLearning.AI 'Building Systems with the ChatGPT API' or LangChain basics. Gives you the conceptual foundation for document Q&A tools.", tags: ["skill", "coding"], est: "Month 7–8" },
+          { id: "m27", title: "Earn one formal AI credential", desc: "Options: Coursera 'AI for Everyone' (non-technical, fast), DeepLearning.AI specialization, or Microsoft AI-900. Adds credibility with partners and investors.", tags: ["credential"], est: "Month 9–12" },
+          { id: "m28", title: "Write an internal case study: 'How GlenLine Uses AI'", desc: "1–2 page narrative covering: workflows implemented, time saved, lessons learned, and roadmap. Useful for LP trust-building and recruiting.", tags: ["deliverable", "leadership"], est: "Month 11–12" },
+        ]
+      }
+    ]
+  }
+];
+
+// Flatten all milestones
+const ALL_MILESTONES = [];
+CURRICULUM.forEach(phase => {
+  phase.tracks.forEach(track => {
+    track.milestones.forEach(m => {
+      ALL_MILESTONES.push({ ...m, phaseIdx: phase.phase, trackId: track.id, trackName: track.name });
+    });
+  });
+});
+const TOTAL = ALL_MILESTONES.length;
+
+// State
+let state = {};
+try { state = JSON.parse(localStorage.getItem('ai_curriculum_state') || '{}'); } catch(e) {}
+
+function saveState() {
+  try { localStorage.setItem('ai_curriculum_state', JSON.stringify(state)); } catch(e) {}
+}
+
+function getCompletedCount() {
+  return ALL_MILESTONES.filter(m => state[m.id]?.done).length;
+}
+
+function getMonthCompletions() {
+  const now = new Date();
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  return ALL_MILESTONES.filter(m => {
+    if (!state[m.id]?.date) return false;
+    return new Date(state[m.id].date) >= monthStart;
+  }).length;
+}
+
+function getCurrentPhase() {
+  const done = getCompletedCount();
+  if (done === 0) return 'P1';
+  const p1Total = CURRICULUM[0].tracks.reduce((a, t) => a + t.milestones.length, 0);
+  const p2Total = p1Total + CURRICULUM[1].tracks.reduce((a, t) => a + t.milestones.length, 0);
+  if (done < p1Total) return 'P1';
+  if (done < p2Total) return 'P2';
+  return 'P3';
+}
+
+function updateGlobalStats() {
+  const done = getCompletedCount();
+  const pct = Math.round((done / TOTAL) * 100);
+  document.getElementById('overall-pct').textContent = pct + '%';
+  document.getElementById('global-bar-fill').style.width = pct + '%';
+  document.getElementById('completed-count').textContent = done + ' milestones completed';
+  document.getElementById('remaining-count').textContent = (TOTAL - done) + ' remaining';
+  document.getElementById('stat-done').textContent = done;
+  document.getElementById('stat-total').textContent = TOTAL;
+  document.getElementById('stat-phase').textContent = getCurrentPhase();
+  document.getElementById('stat-streak').textContent = getMonthCompletions();
+}
+
+function getPhaseCompletion(phaseIdx) {
+  const phase = CURRICULUM[phaseIdx];
+  const milestones = phase.tracks.flatMap(t => t.milestones);
+  const done = milestones.filter(m => state[m.id]?.done).length;
+  return { done, total: milestones.length, pct: Math.round((done / milestones.length) * 100) };
+}
+
+function getTrackCompletion(trackId) {
+  const track = CURRICULUM.flatMap(p => p.tracks).find(t => t.id === trackId);
+  const done = track.milestones.filter(m => state[m.id]?.done).length;
+  return { done, total: track.milestones.length, pct: Math.round((done / track.milestones.length) * 100) };
+}
+
+function formatDate(dateStr) {
+  if (!dateStr) return '';
+  const d = new Date(dateStr);
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+function buildTagHTML(tags) {
+  return tags.map(t => {
+    let cls = '';
+    if (['deliverable', 'critical', 'credential'].includes(t)) cls = 'gold';
+    if (['applied', 'RE'].includes(t)) cls = 'green';
+    return `<span class="tag ${cls}">${t}</span>`;
+  }).join('');
+}
+
+function buildMilestone(m) {
+  const done = state[m.id]?.done;
+  const note = state[m.id]?.note || '';
+  const dateStr = state[m.id]?.date ? formatDate(state[m.id].date) : '';
+  return `
+    <div class="milestone ${done ? 'done' : ''}" id="ms-${m.id}" onclick="toggleMilestone('${m.id}', event)">
+      <div class="milestone-check">${done ? '✓' : ''}</div>
+      <div class="milestone-body">
+        <div class="milestone-title">${m.title}</div>
+        <div class="milestone-desc">${m.desc}</div>
+        <div class="milestone-tags">
+          ${buildTagHTML(m.tags)}
+          <span class="tag">${m.est}</span>
+        </div>
+        <button class="note-toggle" onclick="toggleNote('${m.id}', event)">${note ? 'Edit note' : '+ Add note'}</button>
+        <textarea class="notes-area ${note ? 'show' : ''}" id="note-${m.id}" 
+          placeholder="Add your notes, reflections, or links here..."
+          onclick="event.stopPropagation()"
+          onblur="saveNote('${m.id}')"
+        >${note}</textarea>
+      </div>
+      ${done ? `<div class="done-badge">✓ ${dateStr}</div>` : ''}
+    </div>
+  `;
+}
+
+function buildTrack(track) {
+  const comp = getTrackCompletion(track.id);
+  return `
+    <div class="track">
+      <div class="track-header">
+        <div class="track-icon">${track.icon}</div>
+        <div class="track-name">${track.name}</div>
+        <div class="track-bar"><div class="track-bar-fill" style="width:${comp.pct}%"></div></div>
+        <div class="track-pct">${comp.pct}%</div>
+      </div>
+      <div class="milestones">
+        ${track.milestones.map(m => buildMilestone(m)).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function buildPhasePanel(phase, idx) {
+  const comp = getPhaseCompletion(idx);
+  return `
+    <div class="phase-panel ${idx === 0 ? 'active' : ''}" id="phase-panel-${idx}">
+      <div class="phase-header">
+        <div>
+          <div class="phase-title">${phase.phaseTitle}</div>
+          <div class="phase-meta">${phase.phaseMeta}</div>
+        </div>
+        <div class="phase-progress-pill">
+          <div class="num">${comp.pct}%</div>
+          <div class="lbl">${comp.done}/${comp.total}</div>
+        </div>
+      </div>
+      <div class="hint">
+        <span>→</span> Click any milestone to mark complete. Add notes to track your progress.
+      </div>
+      ${phase.tracks.map(t => buildTrack(t)).join('')}
+    </div>
+  `;
+}
+
+function buildAllPanel() {
+  const done = getCompletedCount();
+  return `
+    <div class="phase-panel" id="phase-panel-3">
+      <div class="phase-header">
+        <div>
+          <div class="phase-title">All Milestones</div>
+          <div class="phase-meta">Complete view · ${done}/${TOTAL} done</div>
+        </div>
+        <div class="phase-progress-pill">
+          <div class="num">${Math.round((done/TOTAL)*100)}%</div>
+          <div class="lbl">${done}/${TOTAL}</div>
+        </div>
+      </div>
+      ${CURRICULUM.flatMap(p => p.tracks).map(t => buildTrack(t)).join('')}
+    </div>
+  `;
+}
+
+function render() {
+  const content = document.getElementById('content');
+  content.innerHTML = 
+    CURRICULUM.map((p, i) => buildPhasePanel(p, i)).join('') + 
+    buildAllPanel();
+  updateGlobalStats();
+  restoreActiveTab();
+}
+
+function toggleMilestone(id, event) {
+  if (event.target.tagName === 'TEXTAREA' || event.target.tagName === 'BUTTON') return;
+  if (!state[id]) state[id] = {};
+  state[id].done = !state[id].done;
+  state[id].date = state[id].done ? new Date().toISOString() : null;
+  saveState();
+  render();
+}
+
+function toggleNote(id, event) {
+  event.stopPropagation();
+  const ta = document.getElementById('note-' + id);
+  if (ta) {
+    ta.classList.toggle('show');
+    if (ta.classList.contains('show')) ta.focus();
+  }
+}
+
+function saveNote(id) {
+  const ta = document.getElementById('note-' + id);
+  if (!ta) return;
+  if (!state[id]) state[id] = {};
+  state[id].note = ta.value;
+  saveState();
+  // Update button text
+  const btn = ta.previousElementSibling;
+  if (btn) btn.textContent = ta.value ? 'Edit note' : '+ Add note';
+}
+
+let activeTabIdx = 0;
+function restoreActiveTab() {
+  document.querySelectorAll('.phase-tab').forEach((tab, i) => {
+    tab.classList.toggle('active', i === activeTabIdx);
+  });
+  document.querySelectorAll('.phase-panel').forEach((panel, i) => {
+    panel.classList.toggle('active', i === activeTabIdx);
+  });
+}
+
+document.querySelectorAll('.phase-tab').forEach((tab, i) => {
+  tab.addEventListener('click', () => {
+    activeTabIdx = i;
+    restoreActiveTab();
+  });
+});
+
+render();
+</script>
+</body>
+</html>
