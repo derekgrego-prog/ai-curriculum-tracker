@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prompt Engineering · Quick Reference</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Source+Code+Pro:wght@400;600&family=Source+Sans+3:wght@300;400;600&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #f5f0e8;
+    font-family: 'Source Sans 3', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+    padding: 40px 24px;
+    color: #1a1814;
+  }
+
+  .page {
+    max-width: 780px;
+    margin: 0 auto;
+    background: #faf7f2;
+    border: 1px solid #d8cfc0;
+    box-shadow: 0 4px 32px rgba(0,0,0,0.08);
+  }
+
+  /* HEADER */
+  .header {
+    background: #1a1814;
+    padding: 28px 36px 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #c9a84c, #e8c96a, #c9a84c);
+  }
+  .header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+  .header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    color: #f0e8d8;
+    letter-spacing: -0.01em;
+    line-height: 1.1;
+  }
+  .header h1 em {
+    color: #c9a84c;
+    font-style: italic;
+  }
+  .header-sub {
+    font-family: 'Source Code Pro', monospace;
+    font-size: 0.62rem;
+    color: #6b6050;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-top: 5px;
+  }
+  .badge {
+    font-family: 'Source Code Pro', monospace;
+    font-size: 0.6rem;
+    color: #c9a84c;
+    border: 1px solid #5a4820;
+    border-radius: 3px;
+    padding: 3px 8px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  /* BODY */
+  .body { padding: 28px 36px 32px; }
+
+  /* CRAFT BOX */
+  .craft-box {
+    background: #1a1814;
+    border-radius: 6px;
+    padding: 20px 24px;
+    margin-bottom: 24px;
+    display: flex;
+    gap: 0;
+    align-items: stretch;
+  }
+  .craft-left {
+    border-right: 1px solid #2a2720;
+    padding-right: 24px;
+    margin-right: 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  .craft-word {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.4rem;
+    color: #c9a84c;
+    letter-spacing: 0.15em;
+    line-height: 1;
+  }
+  .craft-label {
+    font-family: 'Source Code Pro', monospace;
+    font-size: 0.58rem;
+    color: #4a4438;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-top: 4px;
+  }
+  .craft-right {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    justify-content: center;
+  }
+  .craft-row {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+  .craft-letter {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    color: #c9a84c;
+    font-weight: 700;
+    min-width: 14px;
+  }
+  .craft-term {
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #e8e0ce;
+    min-width: 80px;
+  }
+  .craft-desc {
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 0.75rem;
+    color: #6b6355;
+    font-style: italic;
+  }
+
+  /* SECTION */
+  .section {
+    margin-bottom: 20px;
+  }
+  .section-title {
+    font-family: 'Source Code Pro', monospace;
+    font-size: 0.6rem;
+    color: #c9a84c;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    border-bottom: 1px solid #e0d8c8;
+    padding-bottom: 5px;
+    margin-bottom: 12px;
+  }
+
+  /* CONCEPT CARDS */
+  .concepts {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .concept-card {
+    border: 1px solid #e0d8c8;
+    border-radius: 5px;
+    padding: 12px 14px;
+    background: #fff;
+    position: relative;
+  }
+  .concept-card.coming-soon {
+    opacity: 0.4;
+  }
+  .concept-num {
+    font-family: 'Source Code Pro', monospace;
+    font-size: 0.58rem;
+    color: #c9a84c;
+    letter-spacing: 0.08em;
+    margin-bottom: 3px;
+  }
+  .concept-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 0.95rem;
+    color: #1a1814;
+    line-height: 1.2;
+    margin-bottom: 5px;
+  }
+  .concept-body {
+    font-size: 0.73rem;
+    color: #4a4438;
+    line-height: 1.5;
+  }
+  .concept-body strong {
+    color: #1a1814;
+    font-weight: 600;
+  }
+  .soon-label {
+    font-family: 'Source Code Pro', monospace;
+    font-size: 0.58rem;
+    color: #b0a898;
+    letter-spacing: 0.08em;
+    margin-top: 6px;
+    font-style: italic;
+  }
+
+  /* EXAMPLE BOX */
+  .example-wrap {
+    margin-top: 8px;
+  }
+  .example-label {
+    font-family: 'Source Code Pro', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 3px;
+  }
+  .example-label.bad { color: #c04040; }
+  .example-label.good { color: #4a7c59; }
+  .example-text {
+    font-family: 'Source Code Pro', monospace;
+    font-size: 0.65rem;
+    padding: 6px 9px;
+    border-radius: 3px;
+    line-height: 1.5;
+    margin-bottom: 5px;
+  }
+  .example-text.bad {
+    background: #fdf0f0;
+    border: 1px solid #f0d0d0;
+    color: #7a3030;
+  }
+  .example-text.good {
+    background: #f0f7f2;
+    border: 1px solid #c0dcc8;
+    color: #1a3a24;
+  }
+
+  /* FOOTER */
+  .footer {
+    border-top: 1px solid #e0d8c8;
+    padding: 14px 36px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f5f0e8;
+  }
+  .footer-note {
+    font-family: 'Source Code Pro', monospace;
+    font-size: 0.6rem;
+    color: #b0a898;
+    letter-spacing: 0.06em;
+  }
+  .footer-note span { color: #c9a84c; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <div class="header-top">
+      <div>
+        <h1>Prompt Engineering<br><em>Quick Reference</em></h1>
+        <div class="header-sub">RE Investment Track · Personal Cheat Sheet</div>
+      </div>
+      <div class="badge">RTFC · 6 Concepts</div>
+    </div>
+  </div>
+
+  <div class="body">
+
+    <!-- RTFC -->
+    <div class="section">
+      <div class="section-title">The RTFC Framework — Anatomy of a Strong Prompt</div>
+      <div class="craft-box">
+        <div class="craft-left">
+          <div class="craft-word">RTFC</div>
+          <div class="craft-label">framework</div>
+        </div>
+        <div class="craft-right">
+          <div class="craft-row">
+            <div class="craft-letter">R</div>
+            <div class="craft-term">Role</div>
+            <div class="craft-desc">Who Claude is in this context</div>
+          </div>
+          <div class="craft-row">
+            <div class="craft-letter">T</div>
+            <div class="craft-term">Task</div>
+            <div class="craft-desc">Exactly what you want done</div>
+          </div>
+          <div class="craft-row">
+            <div class="craft-letter">F</div>
+            <div class="craft-term">Format</div>
+            <div class="craft-desc">Table, bullets, memo, email, JSON…</div>
+          </div>
+          <div class="craft-row">
+            <div class="craft-letter">C</div>
+            <div class="craft-term">Constraints</div>
+            <div class="craft-desc">What to do when info is missing or ambiguous</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONCEPTS GRID -->
+    <div class="section">
+      <div class="section-title">Core Concepts</div>
+      <div class="concepts">
+
+        <!-- C1 -->
+        <div class="concept-card">
+          <div class="concept-num">CONCEPT 01</div>
+          <div class="concept-name">Be a Director,<br>Not a Googler</div>
+          <div class="concept-body">
+            Treat Claude like a capable new analyst who knows nothing about your firm. Give full context every time — role, task, format, constraints.
+            <div class="example-wrap">
+              <div class="example-label bad">✗ weak</div>
+              <div class="example-text bad">"Summarize this OM"</div>
+              <div class="example-label good">✓ strong</div>
+              <div class="example-text good">"You are an analyst at a CRE investment firm. Extract the following fields from this OM into a table: price, SF, NOI, cap rate, major tenants, lease expirations. Write 'not stated' for any missing field."</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- C2 -->
+        <div class="concept-card">
+          <div class="concept-num">CONCEPT 02</div>
+          <div class="concept-name">Give Examples,<br>Not Just Instructions</div>
+          <div class="concept-body">
+            Show Claude what good output looks like — don't just describe it. Claude will match the pattern of your example in structure, tone, length, and detail. Called <strong>few-shot prompting</strong>.
+            <div class="example-wrap">
+              <div class="example-label bad">✗ weak</div>
+              <div class="example-text bad">"Write a brief investment summary in our firm's style"</div>
+              <div class="example-label good">✓ strong</div>
+              <div class="example-text good">"Write a brief investment summary. Here is an example we liked: [paste prior example]. Match this tone, length, and structure exactly."</div>
+            </div>
+            <strong>Rule of thumb:</strong> if you've written something similar before that you liked, paste it in. One good example beats three paragraphs of instructions.
+          </div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-num">CONCEPT 03</div>
+          <div class="concept-name">Tell Claude How<br>to Think</div>
+          <div class="concept-body">
+            Ask Claude to reason step by step before giving a conclusion. Called <strong>chain-of-thought prompting</strong>. Forces errors to surface during reasoning rather than in the final answer.
+            <div class="example-wrap">
+              <div class="example-label bad">✗ weak</div>
+              <div class="example-text bad">"Is this a good value-add opportunity?"</div>
+              <div class="example-label good">✓ strong</div>
+              <div class="example-text good">"Assess this opportunity step by step: first occupancy vs. market, then unit upside by type, then NOI improvement potential, then overall assessment with key risks."</div>
+            </div>
+            <strong>Shortcut:</strong> adding "think through this step by step before answering" to any prompt meaningfully improves output quality. The reasoning shown is useful in itself — you can spot errors or use the logic as a starting point.
+          </div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-num">CONCEPT 04</div>
+          <div class="concept-name">Iterate,<br>Don't Restart</div>
+          <div class="concept-body">
+            Treat prompting as a conversation, not a single shot. Claude remembers everything earlier in the thread — build on what it produced rather than rewriting from scratch.
+            <div class="example-wrap">
+              <div class="example-label bad">✗ weak</div>
+              <div class="example-text bad">Rewriting the entire prompt from scratch when output isn't right</div>
+              <div class="example-label good">✓ strong</div>
+              <div class="example-text good">"Good — now make the exec summary two sentences shorter" / "Rewrite the risk section to focus specifically on lease rollover risk"</div>
+            </div>
+            <strong>Mindset shift:</strong> your first prompt is a starting point, not a final spec. React to output rather than trying to anticipate everything upfront. <strong>Caveat:</strong> for very long sessions, start a fresh conversation to avoid context limits.
+          </div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-num">CONCEPT 05</div>
+          <div class="concept-name">Control the Output<br>Format Explicitly</div>
+          <div class="concept-body">
+            Don't let Claude choose the format — specify it. Format and content are separate problems. Get format right upfront and output drops straight into your workflow.
+            <div class="example-wrap">
+              <div class="example-label bad">✗ weak</div>
+              <div class="example-text bad">"Summarize the key terms of this lease"</div>
+              <div class="example-label good">✓ strong</div>
+              <div class="example-text good">"Summarize key lease terms in a two-column table: Term | Detail. Rows: tenant, SF, commencement, expiration, base rent, escalations, renewal options, termination rights. Write 'not stated' for missing fields."</div>
+            </div>
+            <strong>Key formats:</strong> table, bullets, numbered list, memo structure, prose paragraphs, JSON. <strong>Control length too:</strong> "in no more than three sentences" / "exactly five bullet points." <strong>Exclude formats:</strong> "do not use bullet points — write in full paragraphs."
+          </div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-num">CONCEPT 06</div>
+          <div class="concept-name">Know What Claude<br>Is Bad At</div>
+          <div class="concept-body">
+            Confident use means knowing when to trust output and when to verify carefully.
+            <div class="example-wrap">
+              <div class="example-label bad">✗ hallucination</div>
+              <div class="example-text bad">Claude states specific figures, dates, or legal terms confidently — but incorrectly. Always instruct it to write "not stated" for missing info, and verify numbers against source docs.</div>
+              <div class="example-label bad">✗ sycophancy</div>
+              <div class="example-text bad">Claude will cave if you push back, even when it was right. Fix: "don't change your answer just because I'm pushing back — only update if I give you a good reason."</div>
+            </div>
+            <strong>Also watch for:</strong> stale market data (no current comps or rates), long document degradation (accuracy drops late in large files), and math errors on complex calculations — set up logic in Claude, run numbers in Excel.<br><br>
+            <strong>Rule:</strong> use freely for drafting, summarizing, structuring. Verify carefully when output involves specific numbers, legal terms, or anything going in front of your IC or LPs.
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer">
+    <div class="footer-note">All concepts complete · <span>6 of 6</span></div>
+    <div class="footer-note">AI Mastery · RE Investment Track</div>
+  </div>
+
+</div>
+</body>
+</html>
