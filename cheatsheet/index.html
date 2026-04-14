@@ -3,435 +3,415 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Mastery Curriculum — GlenLine RE Track</title>
+<title>Prompt Engineering · Quick Reference</title>
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Source+Code+Pro:wght@400;600&family=Source+Sans+3:wght@300;400;600&display=swap');
+
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { background: #0f0e0c; color: #c8c0b0; font-family: system-ui, sans-serif; font-weight: 300; min-height: 100vh; padding-bottom: 60px; }
 
-  .header { border-bottom: 1px solid #222018; padding: 22px 20px 16px; display: flex; justify-content: space-between; align-items: flex-end; }
-  .header-title { font-size: 1.2rem; font-weight: 600; color: #e8e0ce; letter-spacing: -0.01em; }
-  .header-title span { color: #c9a84c; }
-  .header-sub { font-family: monospace; font-size: 0.6rem; color: #3a3830; letter-spacing: 0.1em; text-transform: uppercase; margin-top: 3px; }
-  .header-pct { font-size: 2rem; font-weight: 700; color: #c9a84c; line-height: 1; text-align: right; }
-  .header-pct-label { font-family: monospace; font-size: 0.58rem; color: #3a3830; margin-top: 1px; }
+  body {
+    background: #f5f0e8;
+    font-family: 'Source Sans 3', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+    padding: 40px 24px;
+    color: #1a1814;
+  }
 
-  .global-bar-wrap { padding: 12px 20px; border-bottom: 1px solid #1a1815; }
-  .global-bar { height: 3px; background: #222018; border-radius: 2px; overflow: hidden; }
-  .global-bar-fill { height: 100%; background: linear-gradient(90deg,#7a6430,#c9a84c); border-radius: 2px; transition: width 0.6s ease; }
-  .global-bar-labels { display: flex; justify-content: space-between; margin-top: 5px; font-family: monospace; font-size: 0.6rem; color: #3a3830; }
+  .page {
+    max-width: 780px;
+    margin: 0 auto;
+    background: #faf7f2;
+    border: 1px solid #d8cfc0;
+    box-shadow: 0 4px 32px rgba(0,0,0,0.08);
+  }
 
-  .stats { display: flex; border-bottom: 1px solid #1a1815; }
-  .stat { flex: 1; padding: 10px 0; text-align: center; border-right: 1px solid #1a1815; }
-  .stat:last-child { border-right: none; }
-  .stat-num { font-size: 1.3rem; font-weight: 700; color: #ddd5c0; }
-  .stat-lbl { font-family: monospace; font-size: 0.55rem; color: #3a3830; text-transform: uppercase; letter-spacing: 0.07em; }
+  /* HEADER */
+  .header {
+    background: #1a1814;
+    padding: 28px 36px 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #c9a84c, #e8c96a, #c9a84c);
+  }
+  .header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+  .header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    color: #f0e8d8;
+    letter-spacing: -0.01em;
+    line-height: 1.1;
+  }
+  .header h1 em {
+    color: #c9a84c;
+    font-style: italic;
+  }
+  .header-sub {
+    font-family: 'Source Code Pro', monospace;
+    font-size: 0.62rem;
+    color: #6b6050;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-top: 5px;
+  }
+  .badge {
+    font-family: 'Source Code Pro', monospace;
+    font-size: 0.6rem;
+    color: #c9a84c;
+    border: 1px solid #5a4820;
+    border-radius: 3px;
+    padding: 3px 8px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
 
-  .export-bar { display: flex; gap: 8px; padding: 10px 20px; border-bottom: 1px solid #1a1815; background: #0c0b09; }
-  .export-btn { font-family: monospace; font-size: 0.62rem; padding: 4px 10px; background: #1a1815; border: 1px solid #2a2720; border-radius: 4px; color: #c9a84c; cursor: pointer; }
-  .import-btn { font-family: monospace; font-size: 0.62rem; padding: 4px 10px; background: #1a1815; border: 1px solid #2a2720; border-radius: 4px; color: #55504a; cursor: pointer; }
-  .export-panel { padding: 12px 20px; background: #0c0b09; border-bottom: 1px solid #1a1815; display: none; }
-  .export-panel.show { display: block; }
-  .export-hint { font-family: monospace; font-size: 0.6rem; color: #45403a; margin-bottom: 5px; }
-  .export-textarea { width: 100%; min-height: 70px; background: #151310; border: 1px solid #2a2720; border-radius: 4px; color: #c9a84c; font-family: monospace; font-size: 0.62rem; padding: 7px 9px; resize: vertical; outline: none; }
-  .import-actions { display: flex; gap: 8px; margin-top: 7px; align-items: center; }
-  .import-confirm-btn { font-family: monospace; font-size: 0.62rem; padding: 4px 12px; background: #0f2218; border: 1px solid #1e3a24; border-radius: 4px; color: #6dba85; cursor: pointer; }
-  .import-msg { font-family: monospace; font-size: 0.62rem; }
+  /* BODY */
+  .body { padding: 28px 36px 32px; }
 
-  .phase-nav { display: flex; border-bottom: 1px solid #1a1815; padding: 0 20px; overflow-x: auto; }
-  .phase-tab { padding: 9px 12px 10px; cursor: pointer; font-family: monospace; font-size: 0.62rem; letter-spacing: 0.06em; text-transform: uppercase; color: #3a3830; background: none; border: none; border-bottom: 2px solid transparent; white-space: nowrap; }
-  .phase-tab.active { color: #c9a84c; border-bottom-color: #c9a84c; }
+  /* CRAFT BOX */
+  .craft-box {
+    background: #1a1814;
+    border-radius: 6px;
+    padding: 20px 24px;
+    margin-bottom: 24px;
+    display: flex;
+    gap: 0;
+    align-items: stretch;
+  }
+  .craft-left {
+    border-right: 1px solid #2a2720;
+    padding-right: 24px;
+    margin-right: 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  .craft-word {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.4rem;
+    color: #c9a84c;
+    letter-spacing: 0.15em;
+    line-height: 1;
+  }
+  .craft-label {
+    font-family: 'Source Code Pro', monospace;
+    font-size: 0.58rem;
+    color: #4a4438;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-top: 4px;
+  }
+  .craft-right {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    justify-content: center;
+  }
+  .craft-row {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+  .craft-letter {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    color: #c9a84c;
+    font-weight: 700;
+    min-width: 14px;
+  }
+  .craft-term {
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #e8e0ce;
+    min-width: 80px;
+  }
+  .craft-desc {
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 0.75rem;
+    color: #6b6355;
+    font-style: italic;
+  }
 
-  .content { padding: 20px 20px 60px; }
-  .hint { font-family: monospace; font-size: 0.6rem; color: #2a2820; margin-bottom: 14px; }
+  /* SECTION */
+  .section {
+    margin-bottom: 20px;
+  }
+  .section-title {
+    font-family: 'Source Code Pro', monospace;
+    font-size: 0.6rem;
+    color: #c9a84c;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    border-bottom: 1px solid #e0d8c8;
+    padding-bottom: 5px;
+    margin-bottom: 12px;
+  }
 
-  .phase-panel { display: none; }
-  .phase-panel.active { display: block; }
+  /* CONCEPT CARDS */
+  .concepts {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .concept-card {
+    border: 1px solid #e0d8c8;
+    border-radius: 5px;
+    padding: 12px 14px;
+    background: #fff;
+    position: relative;
+  }
+  .concept-card.coming-soon {
+    opacity: 0.4;
+  }
+  .concept-num {
+    font-family: 'Source Code Pro', monospace;
+    font-size: 0.58rem;
+    color: #c9a84c;
+    letter-spacing: 0.08em;
+    margin-bottom: 3px;
+  }
+  .concept-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 0.95rem;
+    color: #1a1814;
+    line-height: 1.2;
+    margin-bottom: 5px;
+  }
+  .concept-body {
+    font-size: 0.73rem;
+    color: #4a4438;
+    line-height: 1.5;
+  }
+  .concept-body strong {
+    color: #1a1814;
+    font-weight: 600;
+  }
+  .soon-label {
+    font-family: 'Source Code Pro', monospace;
+    font-size: 0.58rem;
+    color: #b0a898;
+    letter-spacing: 0.08em;
+    margin-top: 6px;
+    font-style: italic;
+  }
 
-  .phase-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #1a1815; }
-  .phase-title { font-size: 1rem; font-weight: 600; color: #ddd5c0; }
-  .phase-meta { font-family: monospace; font-size: 0.58rem; color: #3a3830; margin-top: 2px; }
-  .phase-pill { background: #151310; border: 1px solid #222018; border-radius: 5px; padding: 5px 12px; text-align: center; flex-shrink: 0; }
-  .phase-pill-num { font-size: 1.1rem; font-weight: 700; color: #c9a84c; }
-  .phase-pill-lbl { font-family: monospace; font-size: 0.55rem; color: #3a3830; }
+  /* EXAMPLE BOX */
+  .example-wrap {
+    margin-top: 8px;
+  }
+  .example-label {
+    font-family: 'Source Code Pro', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 3px;
+  }
+  .example-label.bad { color: #c04040; }
+  .example-label.good { color: #4a7c59; }
+  .example-text {
+    font-family: 'Source Code Pro', monospace;
+    font-size: 0.65rem;
+    padding: 6px 9px;
+    border-radius: 3px;
+    line-height: 1.5;
+    margin-bottom: 5px;
+  }
+  .example-text.bad {
+    background: #fdf0f0;
+    border: 1px solid #f0d0d0;
+    color: #7a3030;
+  }
+  .example-text.good {
+    background: #f0f7f2;
+    border: 1px solid #c0dcc8;
+    color: #1a3a24;
+  }
 
-  .track { margin-bottom: 24px; }
-  .track-header { display: flex; align-items: center; gap: 8px; margin-bottom: 9px; }
-  .track-icon { width: 24px; height: 24px; border-radius: 50%; border: 1px solid #7a6430; display: flex; align-items: center; justify-content: center; font-size: 0.55rem; color: #c9a84c; font-family: monospace; flex-shrink: 0; }
-  .track-name { font-size: 0.68rem; font-weight: 600; color: #c8c0b0; letter-spacing: 0.05em; text-transform: uppercase; }
-  .track-bar { flex: 1; height: 2px; background: #222018; border-radius: 1px; overflow: hidden; }
-  .track-bar-fill { height: 100%; background: #7a6430; border-radius: 1px; transition: width 0.4s ease; }
-  .track-pct { font-family: monospace; font-size: 0.62rem; color: #45403a; }
-
-  .milestones { padding-left: 32px; display: flex; flex-direction: column; gap: 6px; }
-  .milestone { display: flex; align-items: flex-start; gap: 10px; padding: 11px 13px; border: 1px solid #222018; border-radius: 6px; background: #131210; cursor: pointer; transition: border-color 0.2s; }
-  .milestone:hover { border-color: #3a3530; }
-  .milestone.done { border-color: #1e3a24; background: #0d1a0f; }
-  .milestone-check { width: 18px; height: 18px; border-radius: 50%; flex-shrink: 0; margin-top: 2px; border: 1px solid #3a3530; background: transparent; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 0.6rem; transition: all 0.2s; }
-  .milestone.done .milestone-check { background: #4a7c59; border-color: #4a7c59; }
-  .milestone-body { flex: 1; min-width: 0; }
-  .milestone-title { font-size: 0.8rem; font-weight: 500; color: #ddd5c0; line-height: 1.3; }
-  .milestone.done .milestone-title { color: #3a4a3d; text-decoration: line-through; text-decoration-color: #4a7c59; }
-  .milestone-desc { font-size: 0.7rem; color: #45403a; margin-top: 3px; line-height: 1.5; }
-  .milestone-tags { display: flex; gap: 4px; margin-top: 5px; flex-wrap: wrap; }
-  .tag { font-family: monospace; font-size: 0.58rem; padding: 2px 6px; border-radius: 3px; background: #1a1915; color: #55504a; border: 1px solid #2a2720; letter-spacing: 0.05em; text-transform: uppercase; }
-  .tag.gold { background: #2a2010; color: #c9a84c; border-color: #5a4020; }
-  .tag.green { background: #0f2218; color: #6dba85; border-color: #1e4030; }
-  .note-toggle { font-family: monospace; font-size: 0.6rem; color: #3a3830; background: none; border: none; cursor: pointer; margin-top: 4px; padding: 0; text-decoration: underline; }
-  .note-area { display: none; margin-top: 5px; width: 100%; min-height: 48px; background: #1a1915; border: 1px solid #2a2720; border-radius: 4px; color: #c0b8a8; font-family: monospace; font-size: 0.68rem; padding: 6px 8px; resize: vertical; outline: none; }
-  .note-area.show { display: block; }
-  .done-badge { font-family: monospace; font-size: 0.58rem; color: #4a7c59; background: #0f1f12; border: 1px solid #1e3a24; border-radius: 3px; padding: 2px 6px; flex-shrink: 0; }
+  /* FOOTER */
+  .footer {
+    border-top: 1px solid #e0d8c8;
+    padding: 14px 36px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f5f0e8;
+  }
+  .footer-note {
+    font-family: 'Source Code Pro', monospace;
+    font-size: 0.6rem;
+    color: #b0a898;
+    letter-spacing: 0.06em;
+  }
+  .footer-note span { color: #c9a84c; }
 </style>
 </head>
 <body>
+<div class="page">
 
-<div class="header">
-  <div>
-    <div class="header-title">AI Mastery <span>· RE Track</span></div>
-    <div class="header-sub">GlenLine · 12-Month Learning Curriculum</div>
+  <div class="header">
+    <div class="header-top">
+      <div>
+        <h1>Prompt Engineering<br><em>Quick Reference</em></h1>
+        <div class="header-sub">RE Investment Track · Personal Cheat Sheet</div>
+      </div>
+      <div class="badge">RTFC · 6 Concepts</div>
+    </div>
   </div>
-  <div>
-    <div class="header-pct" id="overall-pct">0%</div>
-    <div class="header-pct-label">COMPLETE</div>
-  </div>
-</div>
 
-<div class="global-bar-wrap">
-  <div class="global-bar"><div class="global-bar-fill" id="global-bar-fill" style="width:0%"></div></div>
-  <div class="global-bar-labels">
-    <span id="done-count">0 of 0 milestones complete</span>
-    <span id="remaining-count">0 remaining</span>
-  </div>
-</div>
+  <div class="body">
 
-<div class="stats">
-  <div class="stat"><div class="stat-num" id="stat-done">0</div><div class="stat-lbl">Done</div></div>
-  <div class="stat"><div class="stat-num" id="stat-total">0</div><div class="stat-lbl">Total</div></div>
-  <div class="stat"><div class="stat-num" id="stat-phase">P1</div><div class="stat-lbl">Phase</div></div>
-  <div class="stat"><div class="stat-num" id="stat-month">0</div><div class="stat-lbl">This Month</div></div>
-</div>
-
-<div class="export-bar">
-  <button class="export-btn" onclick="togglePanel('export')">↑ Export Progress</button>
-  <button class="import-btn" onclick="togglePanel('import')">↓ Import Progress</button>
-</div>
-
-<div class="export-panel" id="export-panel">
-  <div class="export-hint">Copy and save this text. Paste it back using Import to restore progress in a new session.</div>
-  <textarea class="export-textarea" id="export-textarea" readonly onclick="this.select()"></textarea>
-</div>
-
-<div class="export-panel" id="import-panel">
-  <div class="export-hint">Paste your previously exported progress data below.</div>
-  <textarea class="export-textarea" id="import-textarea" placeholder="Paste exported JSON here..."></textarea>
-  <div class="import-actions">
-    <button class="import-confirm-btn" onclick="importProgress()">Import</button>
-    <span class="import-msg" id="import-msg"></span>
-  </div>
-</div>
-
-<nav class="phase-nav" id="phase-nav"></nav>
-<div class="content" id="content"></div>
-
-<script>
-const CURRICULUM = [
-  {
-    phase: 0, phaseTitle: "Phase 1 — Foundation", phaseMeta: "Months 1–3 · Build personal fluency and stabilize the data foundation",
-    tracks: [
-      { id:"T1", icon:"P", name:"Prompt Engineering", milestones:[
-        { id:"m1", title:"Complete a structured prompt engineering course", desc:"Anthropic's prompting docs + DeepLearning.AI short course. Focus on chain-of-thought, role prompting, and structured output.", tags:["skill","free"], est:"Week 1" },
-        { id:"m2", title:"Use AI to draft 3 real IC memos or investment summaries", desc:"Take actual deals from your pipeline. Use Claude to draft narrative sections; compare quality to your own. Track where it helps vs. fails.", tags:["applied","RE"], est:"Weeks 2–3" },
-        { id:"m3", title:"Build a personal prompt library for RE use cases", desc:"20+ saved prompts covering: OM summarization, LP update drafts, covenant analysis, variance commentary, exec summary generation.", tags:["deliverable","RE"], est:"Month 1–2" },
-        { id:"m4", title:"Summarize 5 OM/deal documents using AI document analysis", desc:"Drop PDFs into Claude and extract: asset type, price, NOI, tenant schedule, debt terms, key risks. Evaluate accuracy against source.", tags:["applied","RE"], est:"Month 2" },
-      ]},
-      { id:"T2", icon:"Py", name:"Python for Data Work", milestones:[
-        { id:"m5a", title:"Set up your Python environment", desc:"Install Python and VS Code, run your first 'hello world' script. This friction point trips people up early — get it done in a half-day before anything else.", tags:["skill","coding"], est:"Week 2" },
-        { id:"m5", title:"Complete 'Python for Everybody' on Coursera (first 3 weeks only)", desc:"Free to audit. Video-first, beginner-friendly. Watch weeks 1–3 only: variables, conditionals, functions. Stop there and start applying.", tags:["skill","coding"], est:"Weeks 2–4" },
-        { id:"m6", title:"Have Claude write a rent roll cleanup script — then run and understand it", desc:"Describe your messy Excel export to Claude, let it write the pandas script, run it yourself, and read through the code. Goal is reading and editing, not authoring from scratch.", tags:["applied","coding","RE"], est:"Month 2" },
-        { id:"m7", title:"Have Claude automate one recurring Excel report — then modify it", desc:"Pick your most painful monthly report. Claude writes the openpyxl script; you run it, tweak one thing, and get comfortable making small edits.", tags:["deliverable","coding"], est:"Month 2–3" },
-        { id:"m8", title:"Make your first Anthropic API call from a Python script", desc:"Get an API key, install the SDK, send a prompt, print the response. Do this as a guided exercise with Claude walking you through each step.", tags:["coding","api"], est:"Month 3" },
-      ]},
-      { id:"T3", icon:"XL", name:"AI + Excel Mastery", milestones:[
-        { id:"m9", title:"Use AI to write 10 non-trivial Excel formulas you previously built manually", desc:"Complex IFS, XLOOKUP, array formulas, dynamic ranges. Prompt for the formula, test it, understand it. Never Google a formula again.", tags:["skill","excel"], est:"Month 1" },
-        { id:"m10", title:"Use AI to write a VBA macro for a recurring task", desc:"Formatting cleanup, report generation, multi-sheet consolidation. Use your existing VBA familiarity to evaluate and edit the output.", tags:["applied","excel"], est:"Month 2–3" },
-      ]},
-      { id:"T4", icon:"DI", name:"Data Infrastructure", milestones:[
-        { id:"m11", title:"Consolidate and file all four loan agreements into deal folders", desc:"Locate scattered loan docs and file each into the correct deal folder under 06. Lender Reporting. Half-day task that unblocks covenant tracking and Copilot queries.", tags:["critical","RE"], est:"Week 1–2" },
-        { id:"m12", title:"Get deal folder structure approved and implement across all active deals", desc:"Present staged folder structure to partners/CFO for sign-off. Structure: /[Deal Name] → 01. Acquisition, 02. Legal & Closing, 03. Financing & Capital Accounts, 04. Asset Management (Financials, PM Reports, Budgets, Leases, Capex, AM Model), 05. Investor Reporting, 06. Lender Reporting, 07. Disposition, 08. Working. Folders created in stages: Active Pursuit (01–02), Under Contract (03–06), Closing (07–08).", tags:["critical","RE","governance"], est:"Week 2–3" },
-        { id:"m13", title:"Write and publish SharePoint naming convention document", desc:"One-page standard covering file naming, folder naming, and version control. Publish to GlenLine Admin site. Apply to all new files going forward.", tags:["deliverable","governance"], est:"Week 2–3" },
-        { id:"m14", title:"Set up GlenLine Finance Data Hub — create standardized export folders", desc:"Create a Data Hub subsite or document library in GlenLine Finance SharePoint. Set up subfolders: /QBO-Exports, /Breeze-Exports, /Voyager-Reports. Define standard report names.", tags:["deliverable","coding"], est:"Month 2" },
-        { id:"m15", title:"Complete first full monthly export cycle from all three accounting systems", desc:"Pull standard reports from QBO (both instances), Yardi Breeze, and Voyager into the Data Hub on the same date. Document the pull procedure for each system.", tags:["deliverable","RE"], est:"Month 2–3" },
-      ]},
-      { id:"T5", icon:"DS", name:"Deal Sourcing — Quick Start", milestones:[
-        { id:"m16", title:"Build standard CoStar export template — define fields to always include", desc:"Document the exact CoStar fields to export every time: RBA, property type, secondary type, percent leased, year built, available SF, last sale, true owner, owner contact, tenancy. Save as a CoStar saved search.", tags:["deliverable","RE"], est:"This week" },
-        { id:"m17", title:"Build the deal database as a SharePoint List", desc:"Set up the central deal database in SharePoint: address, size, type, owner, tenancy, thesis fit score, status, contact info, notes, deal folder link. Your permanent deal intelligence database.", tags:["deliverable","RE"], est:"This week" },
-        { id:"m18", title:"Build the thesis fit scoring prompt", desc:"Craft a Claude prompt that takes a property's CoStar data and outputs: owner type classification, thesis fit assessment (manufacturing/infrastructure/defense tenant, 6–8 yr WALT, below-market rents), recommended next step, and draft outreach email.", tags:["deliverable","RE"], est:"This week" },
-        { id:"m19", title:"Run first manual end-to-end deal sourcing workflow", desc:"Export CoStar CSV → filter manually in Excel (50–200k SF, industrial/flex, occupancy, exclude non-industrial) → paste shortlisted properties into Claude scoring prompt → log results to SharePoint List.", tags:["applied","RE"], est:"Week 2" },
-      ]},
-    ]
-  },
-  {
-    phase: 1, phaseTitle: "Phase 2 — Application", phaseMeta: "Months 3–6 · Automate core workflows across all business areas",
-    tracks: [
-      { id:"T6", icon:"DA", name:"Deal Sourcing — Automation", milestones:[
-        { id:"m20", title:"Build the CoStar screening script", desc:"Python script reads CoStar CSV, applies physical criteria filters (50–200k SF, industrial/flex, occupancy thresholds, exclude self-storage/specialty), flags single-tenant and private owners as high priority, outputs scored shortlist to Excel.", tags:["deliverable","coding","RE"], est:"Month 3" },
-        { id:"m21", title:"Build the Stage 2 AI enrichment workflow", desc:"Python script passes each shortlisted property to Claude API: owner type classification (institutional REIT vs. private vs. operating company), tenant thesis fit flag (manufacturing/infrastructure/defense), outreach priority recommendation.", tags:["deliverable","coding","api","RE"], est:"Month 3–4" },
-        { id:"m22", title:"Build AI investment memo first draft workflow", desc:"Prompt that takes structured deal data + thesis bullets and outputs a 10–15 page investment memo draft tailored to a specific investor. Reduces memo production from days to hours.", tags:["deliverable","RE","api"], est:"Month 4–5" },
-        { id:"m23", title:"Run 10 real deals through the full automated workflow and refine", desc:"End-to-end: CoStar export → screening script → AI enrichment → thesis scoring → SharePoint List logging. Measure accuracy, tune prompts, validate owner data. Target: 80%+ field accuracy.", tags:["applied","RE"], est:"Month 5" },
-      ]},
-      { id:"T7", icon:"AM", name:"Asset Management & Reporting", milestones:[
-        { id:"m24", title:"Build the Reporting Obligations SharePoint List", desc:"Set up the reporting tracker: deal, entity, entity level, report type, frequency, due date, responsible party, status, completion date, Agora published flag, document link. Enter all active deals and entities.", tags:["critical","RE"], est:"Month 3" },
-        { id:"m25", title:"Build the Loan Database SharePoint List", desc:"Set up loan database: lender, loan type, amount, rate, maturity, extension options, DSCR covenant, occupancy covenant, reporting requirements, lender contact, loan doc link. Enter all four active loans.", tags:["critical","RE"], est:"Month 3" },
-        { id:"m26", title:"Run parallel with Monday.com for one month — then deprecate", desc:"Keep Monday.com running alongside the new SharePoint tracker for one full month. Validate completeness, fix gaps, confirm team adoption. Then shut down Monday.com boards.", tags:["governance","leadership"], est:"Month 3–4" },
-        { id:"m27", title:"Build Power Automate reporting deadline reminders", desc:"Set up automated email alerts from the Reporting Obligations SharePoint List: 30-day warning, 7-day warning, and overdue notifications. Route to responsible party automatically.", tags:["deliverable","coding"], est:"Month 4" },
-        { id:"m28", title:"Build AI-assisted quarterly letter drafting workflow", desc:"Claude takes Voyager financials and performance data for a deal and drafts the quarterly investor letter narrative. One body uploaded to Agora per deal. Target: 70% written by AI.", tags:["deliverable","RE","api"], est:"Month 4–5" },
-        { id:"m29", title:"Build covenant monitoring script", desc:"Python script compares actual DSCR and occupancy from Voyager exports against covenant thresholds in the Loan Database. Flags properties approaching a breach. Runs monthly as part of close process.", tags:["deliverable","coding","RE"], est:"Month 5–6" },
-      ]},
-      { id:"T8", icon:"AC", name:"Entity Accounting & Treasury", milestones:[
-        { id:"m30", title:"Build bank rec automation script — one bank first", desc:"Start with whichever bank exports the cleanest CSV. Have Claude write a script that compares bank statement exports vs. QBO GL entries and flags unmatched items. Validate before expanding.", tags:["deliverable","coding","RE"], est:"Month 3–4" },
-        { id:"m31", title:"Expand bank rec to all 34 accounts across 6 banks", desc:"Extend the script to handle Chase, EagleBank, Texas Capital, Truist, Wells Fargo, and Hingham export formats. Handle format inconsistencies. Target: full monthly rec in under 1 hour.", tags:["deliverable","coding","RE"], est:"Month 4–5" },
-        { id:"m32", title:"Build intercompany rec automation", desc:"Script that validates fixed monthly intercompany flows: investment entities → GLO (mgmt fees), VTO → GLO (employee allocation), VTO → GLP (shared employees), GLP → 3rd party PMs. Flags variances.", tags:["deliverable","coding","RE"], est:"Month 4–5" },
-        { id:"m33", title:"Build single-entity consolidation script — start with one entity", desc:"Have Claude write a Python script for one Yardi Breeze entity, one month's trial balance export. Validate the numbers before expanding. Understand the scaffold before scaling.", tags:["deliverable","coding","RE"], est:"Month 5" },
-        { id:"m34", title:"Expand consolidation to full multi-entity P&L and balance sheet", desc:"Extend script to pull from all Yardi Breeze entities plus QBO (both instances) and produce a consolidated P&L and balance sheet. Most impactful accounting automation in the curriculum.", tags:["deliverable","coding","RE"], est:"Month 5–6" },
-      ]},
-    ]
-  },
-  {
-    phase: 2, phaseTitle: "Phase 3 — Leadership", phaseMeta: "Months 6–12 · Layer AI on clean infrastructure, build firm-wide tools",
-    tracks: [
-      { id:"T9", icon:"IR", name:"Investor Relations & Reporting", milestones:[
-        { id:"m35", title:"Build AI-assisted LP report narrative pipeline", desc:"Claude takes quarterly variance data and outputs full narrative commentary for LP reports. Target: 70% written by AI, 30% human edit. Covers all active deals on a consistent schedule.", tags:["deliverable","RE","api"], est:"Month 6–7" },
-        { id:"m36", title:"Build Agora feed process — standardized monthly push of Yardi Breeze financials", desc:"Define and document the monthly process for pushing Yardi Breeze financial exports into Agora for each active entity. Manual process first, automate later if volume justifies.", tags:["deliverable","RE"], est:"Month 7" },
-        { id:"m37", title:"Build investor CRM as a SharePoint List", desc:"Central LP database: name, entity, relationship owner, deal history, investment preferences, contact info, last contact date. Replaces the Excel contact list and institutional memory.", tags:["deliverable","RE"], est:"Month 7–8" },
-        { id:"m38", title:"Build K-1 tracking workflow integrated into reporting obligations tracker", desc:"Add K-1 preparation and delivery as a tracked item in the Reporting Obligations List. Link to tax accountants' delivery confirmation. Covers all active entities on annual cycle.", tags:["deliverable","RE"], est:"Month 8" },
-      ]},
-      { id:"T10", icon:"AI", name:"Firm-Wide AI & Data Adoption", milestones:[
-        { id:"m39", title:"Write one-page firm AI policy — data governance basics", desc:"What can go into consumer AI tools vs. enterprise tools. Cover: LP data, deal data, entity financials, counterparty info, loan terms. Get CFO and managing partner sign-off.", tags:["governance","leadership"], est:"Month 6–7" },
-        { id:"m40", title:"Enable and configure Microsoft Copilot across SharePoint", desc:"Activate Copilot across GlenLine Finance, GlenLine Main, and Vitrian Main. Test queries: 'which Q3 investor letters are outstanding', 'summarize Crown Center loan terms', 'show lender reports due in 30 days'.", tags:["deliverable","leadership"], est:"Month 7–8" },
-        { id:"m41", title:"Build Power BI portfolio dashboard", desc:"Connect Power BI to SharePoint Lists (reporting obligations, loan database, deal pipeline). Dashboard shows: reporting status by deal, upcoming deadlines, loan maturities, deal pipeline by stage. Live in team meetings.", tags:["deliverable","leadership"], est:"Month 8–10" },
-        { id:"m42", title:"Run AI demo session for investment team", desc:"45-minute session: CoStar screening workflow, investment memo drafting, quarterly letter generation, Copilot document queries. Let the team try each use case live.", tags:["leadership"], est:"Month 8" },
-        { id:"m43", title:"Deploy shared prompt library across the firm", desc:"SharePoint page with 30+ curated prompts by function: deal sourcing, underwriting, investor relations, accounting, lender reporting, legal review. Team-editable and maintained.", tags:["deliverable","leadership"], est:"Month 8–9" },
-        { id:"m44", title:"Present AI ROI summary to firm leadership", desc:"Quantify time saved across implemented workflows. Show Power BI dashboard. Propose next investments — tools, hires, or expanded data sources. Make the case for continuing.", tags:["leadership"], est:"Month 10–12" },
-        { id:"m45", title:"Earn one formal AI credential", desc:"Coursera 'AI for Everyone', DeepLearning.AI specialization, or Microsoft AI-900. Adds credibility with partners, investors, and future hires.", tags:["credential"], est:"Month 9–12" },
-        { id:"m46", title:"Write internal case study: How GlenLine Uses AI", desc:"1–2 page narrative covering workflows implemented, time saved, lessons learned, and roadmap. Useful for LP trust-building, recruiting, and future capital raises.", tags:["deliverable","leadership"], est:"Month 11–12" },
-      ]},
-    ]
-  }
-];
-
-const COMPLETED_BY_DEFAULT = new Set(["m1","m2","m3","m4","m5a","m5","m9","m10"]);
-const ALL_MILESTONES = CURRICULUM.flatMap(p => p.tracks.flatMap(t => t.milestones));
-const TOTAL = ALL_MILESTONES.length;
-
-// State
-let state = {};
-try { const s = localStorage.getItem('gl_curriculum_v2'); if (s) state = JSON.parse(s); } catch(e) {}
-if (Object.keys(state).length === 0) {
-  COMPLETED_BY_DEFAULT.forEach(id => { state[id] = { done: true, date: new Date().toISOString() }; });
-}
-
-function save() { try { localStorage.setItem('gl_curriculum_v2', JSON.stringify(state)); } catch(e) {} }
-
-function tagClass(t) {
-  if (['deliverable','critical','credential'].includes(t)) return 'gold';
-  if (['RE','applied'].includes(t)) return 'green';
-  return '';
-}
-
-function getPhaseStats(idx) {
-  const ms = CURRICULUM[idx].tracks.flatMap(t => t.milestones);
-  const d = ms.filter(m => state[m.id]?.done).length;
-  return { done: d, total: ms.length, pct: Math.round((d/ms.length)*100) };
-}
-
-function getDone() { return ALL_MILESTONES.filter(m => state[m.id]?.done).length; }
-
-function getMonthDone() {
-  const now = new Date(), ms = new Date(now.getFullYear(), now.getMonth(), 1);
-  return ALL_MILESTONES.filter(m => state[m.id]?.date && new Date(state[m.id].date) >= ms).length;
-}
-
-function getCurrentPhase() {
-  const p1 = CURRICULUM[0].tracks.reduce((a,t) => a+t.milestones.length, 0);
-  const p2 = p1 + CURRICULUM[1].tracks.reduce((a,t) => a+t.milestones.length, 0);
-  const d = getDone();
-  return d < p1 ? 'P1' : d < p2 ? 'P2' : 'P3';
-}
-
-function updateStats() {
-  const done = getDone();
-  const pct = Math.round((done/TOTAL)*100);
-  document.getElementById('overall-pct').textContent = pct + '%';
-  document.getElementById('global-bar-fill').style.width = pct + '%';
-  document.getElementById('done-count').textContent = done + ' of ' + TOTAL + ' milestones complete';
-  document.getElementById('remaining-count').textContent = (TOTAL-done) + ' remaining';
-  document.getElementById('stat-done').textContent = done;
-  document.getElementById('stat-total').textContent = TOTAL;
-  document.getElementById('stat-phase').textContent = getCurrentPhase();
-  document.getElementById('stat-month').textContent = getMonthDone();
-  // Update track bars and phase pills
-  CURRICULUM.forEach((phase, pi) => {
-    const ps = getPhaseStats(pi);
-    const pill = document.getElementById('pill-'+pi);
-    if (pill) { pill.querySelector('.phase-pill-num').textContent = ps.pct+'%'; pill.querySelector('.phase-pill-lbl').textContent = ps.done+'/'+ps.total; }
-    phase.tracks.forEach(track => {
-      const done = track.milestones.filter(m => state[m.id]?.done).length;
-      const pct = Math.round((done/track.milestones.length)*100);
-      const bar = document.getElementById('tbar-'+track.id);
-      const pctEl = document.getElementById('tpct-'+track.id);
-      if (bar) bar.style.width = pct + '%';
-      if (pctEl) pctEl.textContent = pct + '%';
-    });
-    // Update tab pct
-    const tabPct = document.getElementById('tabpct-'+pi);
-    if (tabPct) tabPct.textContent = ps.pct + '%';
-  });
-}
-
-function toggleMilestone(id) {
-  if (!state[id]) state[id] = {};
-  state[id].done = !state[id].done;
-  state[id].date = state[id].done ? new Date().toISOString() : null;
-  const el = document.getElementById('ms-'+id);
-  if (el) {
-    el.classList.toggle('done', state[id].done);
-    const check = el.querySelector('.milestone-check');
-    if (check) check.textContent = state[id].done ? '✓' : '';
-    const title = el.querySelector('.milestone-title');
-    if (title) title.style.textDecoration = state[id].done ? 'line-through' : 'none';
-    const badge = el.querySelector('.done-badge');
-    if (badge) badge.style.display = state[id].done ? 'inline-block' : 'none';
-  }
-  save();
-  updateStats();
-}
-
-function toggleNote(id, btn) {
-  const ta = document.getElementById('note-'+id);
-  if (ta) { ta.classList.toggle('show'); if (ta.classList.contains('show')) { ta.focus(); btn.textContent = 'edit note'; } }
-}
-
-function saveNote(id) {
-  const ta = document.getElementById('note-'+id);
-  if (!ta) return;
-  if (!state[id]) state[id] = {};
-  state[id].note = ta.value;
-  save();
-  const btn = document.getElementById('notebtn-'+id);
-  if (btn) btn.textContent = ta.value ? 'edit note' : '+ note';
-}
-
-function buildMilestone(m) {
-  const done = !!state[m.id]?.done;
-  const note = state[m.id]?.note || '';
-  return `
-    <div class="milestone ${done?'done':''}" id="ms-${m.id}" onclick="toggleMilestone('${m.id}')">
-      <div class="milestone-check">${done?'✓':''}</div>
-      <div class="milestone-body">
-        <div class="milestone-title" style="text-decoration:${done?'line-through':'none'}">${m.title}</div>
-        <div class="milestone-desc">${m.desc}</div>
-        <div class="milestone-tags">
-          ${m.tags.map(t=>`<span class="tag ${tagClass(t)}">${t}</span>`).join('')}
-          <span class="tag">${m.est}</span>
+    <!-- RTFC -->
+    <div class="section">
+      <div class="section-title">The RTFC Framework — Anatomy of a Strong Prompt</div>
+      <div class="craft-box">
+        <div class="craft-left">
+          <div class="craft-word">RTFC</div>
+          <div class="craft-label">framework</div>
         </div>
-        <button class="note-toggle" id="notebtn-${m.id}" onclick="event.stopPropagation();toggleNote('${m.id}',this)">${note?'edit note':'+ note'}</button>
-        <textarea class="note-area ${note?'show':''}" id="note-${m.id}" onclick="event.stopPropagation()" onblur="saveNote('${m.id}')" placeholder="Notes, links, reflections...">${note}</textarea>
-      </div>
-      <span class="done-badge" style="display:${done?'inline-block':'none'}">done</span>
-    </div>`;
-}
-
-function buildTrack(track) {
-  const done = track.milestones.filter(m => state[m.id]?.done).length;
-  const pct = Math.round((done/track.milestones.length)*100);
-  return `
-    <div class="track">
-      <div class="track-header">
-        <div class="track-icon">${track.icon}</div>
-        <div class="track-name">${track.name}</div>
-        <div class="track-bar"><div class="track-bar-fill" id="tbar-${track.id}" style="width:${pct}%"></div></div>
-        <div class="track-pct" id="tpct-${track.id}">${pct}%</div>
-      </div>
-      <div class="milestones">${track.milestones.map(buildMilestone).join('')}</div>
-    </div>`;
-}
-
-let activeTab = 0;
-
-function buildNav() {
-  const nav = document.getElementById('phase-nav');
-  const tabs = ['Phase 1', 'Phase 2', 'Phase 3', 'All'];
-  nav.innerHTML = tabs.map((t,i) => {
-    const pct = i < 3 ? ` <span id="tabpct-${i}" style="opacity:0.5">${getPhaseStats(i).pct}%</span>` : '';
-    return `<button class="phase-tab ${i===0?'active':''}" onclick="switchTab(${i})">${t}${pct}</button>`;
-  }).join('');
-}
-
-function buildContent() {
-  const content = document.getElementById('content');
-  content.innerHTML = '<div class="hint">→ Click any milestone to mark complete · click again to unmark</div>';
-  const phases = activeTab < 3 ? [CURRICULUM[activeTab]] : CURRICULUM;
-  phases.forEach(phase => {
-    const ps = getPhaseStats(phase.phase);
-    content.innerHTML += `
-      <div class="phase-panel active" id="phase-panel-${phase.phase}">
-        <div class="phase-header">
-          <div>
-            <div class="phase-title">${phase.phaseTitle}</div>
-            <div class="phase-meta">${phase.phaseMeta}</div>
+        <div class="craft-right">
+          <div class="craft-row">
+            <div class="craft-letter">R</div>
+            <div class="craft-term">Role</div>
+            <div class="craft-desc">Who Claude is in this context</div>
           </div>
-          <div class="phase-pill" id="pill-${phase.phase}">
-            <div class="phase-pill-num">${ps.pct}%</div>
-            <div class="phase-pill-lbl">${ps.done}/${ps.total}</div>
+          <div class="craft-row">
+            <div class="craft-letter">T</div>
+            <div class="craft-term">Task</div>
+            <div class="craft-desc">Exactly what you want done</div>
+          </div>
+          <div class="craft-row">
+            <div class="craft-letter">F</div>
+            <div class="craft-term">Format</div>
+            <div class="craft-desc">Table, bullets, memo, email, JSON…</div>
+          </div>
+          <div class="craft-row">
+            <div class="craft-letter">C</div>
+            <div class="craft-term">Constraints</div>
+            <div class="craft-desc">What to do when info is missing or ambiguous</div>
           </div>
         </div>
-        ${phase.tracks.map(buildTrack).join('')}
-      </div>`;
-  });
-}
+      </div>
+    </div>
 
-function switchTab(idx) {
-  activeTab = idx;
-  document.querySelectorAll('.phase-tab').forEach((t,i) => t.classList.toggle('active', i===idx));
-  buildContent();
-  updateStats();
-}
+    <!-- CONCEPTS GRID -->
+    <div class="section">
+      <div class="section-title">Core Concepts</div>
+      <div class="concepts">
 
-function togglePanel(which) {
-  const exportPanel = document.getElementById('export-panel');
-  const importPanel = document.getElementById('import-panel');
-  if (which === 'export') {
-    const showing = exportPanel.classList.contains('show');
-    exportPanel.classList.toggle('show', !showing);
-    importPanel.classList.remove('show');
-    if (!showing) document.getElementById('export-textarea').value = JSON.stringify(state, null, 2);
-  } else {
-    const showing = importPanel.classList.contains('show');
-    importPanel.classList.toggle('show', !showing);
-    exportPanel.classList.remove('show');
-  }
-}
+        <!-- C1 -->
+        <div class="concept-card">
+          <div class="concept-num">CONCEPT 01</div>
+          <div class="concept-name">Be a Director,<br>Not a Googler</div>
+          <div class="concept-body">
+            Treat Claude like a capable new analyst who knows nothing about your firm. Give full context every time — role, task, format, constraints.
+            <div class="example-wrap">
+              <div class="example-label bad">✗ weak</div>
+              <div class="example-text bad">"Summarize this OM"</div>
+              <div class="example-label good">✓ strong</div>
+              <div class="example-text good">"You are an analyst at a CRE investment firm. Extract the following fields from this OM into a table: price, SF, NOI, cap rate, major tenants, lease expirations. Write 'not stated' for any missing field."</div>
+            </div>
+          </div>
+        </div>
 
-function importProgress() {
-  const text = document.getElementById('import-textarea').value;
-  const msg = document.getElementById('import-msg');
-  try {
-    state = JSON.parse(text);
-    save();
-    buildContent();
-    updateStats();
-    msg.textContent = '✓ Imported!';
-    msg.style.color = '#6dba85';
-    document.getElementById('import-textarea').value = '';
-    setTimeout(() => { document.getElementById('import-panel').classList.remove('show'); msg.textContent = ''; }, 1200);
-  } catch(e) {
-    msg.textContent = '⚠ Invalid data.';
-    msg.style.color = '#c97a2a';
-  }
-}
+        <!-- C2 -->
+        <div class="concept-card">
+          <div class="concept-num">CONCEPT 02</div>
+          <div class="concept-name">Give Examples,<br>Not Just Instructions</div>
+          <div class="concept-body">
+            Show Claude what good output looks like — don't just describe it. Claude will match the pattern of your example in structure, tone, length, and detail. Called <strong>few-shot prompting</strong>.
+            <div class="example-wrap">
+              <div class="example-label bad">✗ weak</div>
+              <div class="example-text bad">"Write a brief investment summary in our firm's style"</div>
+              <div class="example-label good">✓ strong</div>
+              <div class="example-text good">"Write a brief investment summary. Here is an example we liked: [paste prior example]. Match this tone, length, and structure exactly."</div>
+            </div>
+            <strong>Rule of thumb:</strong> if you've written something similar before that you liked, paste it in. One good example beats three paragraphs of instructions.
+          </div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-num">CONCEPT 03</div>
+          <div class="concept-name">Tell Claude How<br>to Think</div>
+          <div class="concept-body">
+            Ask Claude to reason step by step before giving a conclusion. Called <strong>chain-of-thought prompting</strong>. Forces errors to surface during reasoning rather than in the final answer.
+            <div class="example-wrap">
+              <div class="example-label bad">✗ weak</div>
+              <div class="example-text bad">"Is this a good value-add opportunity?"</div>
+              <div class="example-label good">✓ strong</div>
+              <div class="example-text good">"Assess this opportunity step by step: first occupancy vs. market, then unit upside by type, then NOI improvement potential, then overall assessment with key risks."</div>
+            </div>
+            <strong>Shortcut:</strong> adding "think through this step by step before answering" to any prompt meaningfully improves output quality. The reasoning shown is useful in itself — you can spot errors or use the logic as a starting point.
+          </div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-num">CONCEPT 04</div>
+          <div class="concept-name">Iterate,<br>Don't Restart</div>
+          <div class="concept-body">
+            Treat prompting as a conversation, not a single shot. Claude remembers everything earlier in the thread — build on what it produced rather than rewriting from scratch.
+            <div class="example-wrap">
+              <div class="example-label bad">✗ weak</div>
+              <div class="example-text bad">Rewriting the entire prompt from scratch when output isn't right</div>
+              <div class="example-label good">✓ strong</div>
+              <div class="example-text good">"Good — now make the exec summary two sentences shorter" / "Rewrite the risk section to focus specifically on lease rollover risk"</div>
+            </div>
+            <strong>Mindset shift:</strong> your first prompt is a starting point, not a final spec. React to output rather than trying to anticipate everything upfront. <strong>Caveat:</strong> for very long sessions, start a fresh conversation to avoid context limits.
+          </div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-num">CONCEPT 05</div>
+          <div class="concept-name">Control the Output<br>Format Explicitly</div>
+          <div class="concept-body">
+            Don't let Claude choose the format — specify it. Format and content are separate problems. Get format right upfront and output drops straight into your workflow.
+            <div class="example-wrap">
+              <div class="example-label bad">✗ weak</div>
+              <div class="example-text bad">"Summarize the key terms of this lease"</div>
+              <div class="example-label good">✓ strong</div>
+              <div class="example-text good">"Summarize key lease terms in a two-column table: Term | Detail. Rows: tenant, SF, commencement, expiration, base rent, escalations, renewal options, termination rights. Write 'not stated' for missing fields."</div>
+            </div>
+            <strong>Key formats:</strong> table, bullets, numbered list, memo structure, prose paragraphs, JSON. <strong>Control length too:</strong> "in no more than three sentences" / "exactly five bullet points." <strong>Exclude formats:</strong> "do not use bullet points — write in full paragraphs."
+          </div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-num">CONCEPT 06</div>
+          <div class="concept-name">Know What Claude<br>Is Bad At</div>
+          <div class="concept-body">
+            Confident use means knowing when to trust output and when to verify carefully.
+            <div class="example-wrap">
+              <div class="example-label bad">✗ hallucination</div>
+              <div class="example-text bad">Claude states specific figures, dates, or legal terms confidently — but incorrectly. Always instruct it to write "not stated" for missing info, and verify numbers against source docs.</div>
+              <div class="example-label bad">✗ sycophancy</div>
+              <div class="example-text bad">Claude will cave if you push back, even when it was right. Fix: "don't change your answer just because I'm pushing back — only update if I give you a good reason."</div>
+            </div>
+            <strong>Also watch for:</strong> stale market data (no current comps or rates), long document degradation (accuracy drops late in large files), and math errors on complex calculations — set up logic in Claude, run numbers in Excel.<br><br>
+            <strong>Rule:</strong> use freely for drafting, summarizing, structuring. Verify carefully when output involves specific numbers, legal terms, or anything going in front of your IC or LPs.
+          </div>
+        </div>
 
-buildNav();
-buildContent();
-updateStats();
-</script>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer">
+    <div class="footer-note">All concepts complete · <span>6 of 6</span></div>
+    <div class="footer-note">AI Mastery · RE Investment Track</div>
+  </div>
+
+</div>
 </body>
 </html>
