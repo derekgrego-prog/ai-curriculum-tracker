@@ -162,10 +162,11 @@ const CURRICULUM = [
         { id:"m15", title:"Complete first full monthly export cycle from all three accounting systems", desc:"Pull standard reports from QBO (both instances), Yardi Breeze, and Voyager into the Data Hub on the same date. Document the pull procedure for each system.", tags:["deliverable","RE"], est:"Month 2–3" },
       ]},
       { id:"T5", icon:"DS", name:"Deal Sourcing — Quick Start", milestones:[
-        { id:"m16", title:"Build standard CoStar export template — define fields to always include", desc:"Document the exact CoStar fields to export every time: RBA, property type, secondary type, percent leased, year built, available SF, last sale, true owner, owner contact, tenancy. Save as a CoStar saved search.", tags:["deliverable","RE"], est:"This week" },
-        { id:"m17", title:"Build the deal database as a SharePoint List", desc:"Set up the central deal database in SharePoint: address, size, type, owner, tenancy, thesis fit score, status, contact info, notes, deal folder link. Your permanent deal intelligence database.", tags:["deliverable","RE"], est:"This week" },
-        { id:"m18", title:"Build the thesis fit scoring prompt", desc:"Craft a Claude prompt that takes a property's CoStar data and outputs: owner type classification, thesis fit assessment (manufacturing/infrastructure/defense tenant, 6–8 yr WALT, below-market rents), recommended next step, and draft outreach email.", tags:["deliverable","RE"], est:"This week" },
-        { id:"m19", title:"Run first manual end-to-end deal sourcing workflow", desc:"Export CoStar CSV → filter manually in Excel (50–200k SF, industrial/flex, occupancy, exclude non-industrial) → paste shortlisted properties into Claude scoring prompt → log results to SharePoint List.", tags:["applied","RE"], est:"Week 2" },
+        { id:"m16", title:"Build standard CoStar export template — define fields to always include", desc:"Document the exact CoStar fields to export every time including the updated fields: RBA, property type, secondary type, percent leased, ceiling height, column spacing, loading docks, drive ins, electric utility, power capacity, year built, available SF, last sale, true owner, owner contact, fund name, tenancy. Save as a CoStar saved search. NOTE: Build and validate in test SharePoint before production.", tags:["deliverable","RE"], est:"This week" },
+        { id:"m17", title:"Build Property Research Database and Deal Pipeline tables in Excel", desc:"Two separate tables in your master tracker: (1) Property Research Database — all screened properties, full CoStar fields plus inference columns for tenant type, property use, and power capacity. (2) Deal Pipeline — lean action-focused table for properties that pass screening, with outreach tracking fields. Build and validate in test environment first.", tags:["deliverable","RE"], est:"This week" },
+        { id:"m18", title:"Build the CoStar screening prompt with inference logic", desc:"Claude prompt that takes the full CoStar CSV export and: applies hard filters (50–200k SF, industrial/flex, 75%+ leased, exclude non-industrial), scores remaining properties by owner type and tenant signals, infers tenant type and property use from owner name/building name/secondary type, infers power capacity from secondary type where CoStar field is blank, outputs prioritized table with Thesis Fit (Strong/Possible/Weak) and Priority (High/Medium/Low).", tags:["deliverable","RE"], est:"This week" },
+        { id:"m19", title:"Run CoStar export through Claude screening prompt and log results to Property Research Database", desc:"Export CoStar CSV → paste into Claude screening prompt → review output → log ALL screened properties to Property Research Database → manually promote High/Medium priority properties to Deal Pipeline. First full manual end-to-end run. Validate accuracy of inferences against known properties.", tags:["applied","RE"], est:"Week 2" },
+        { id:"m19b", title:"Build Power Automate workflow to promote high priority properties from Research to Pipeline", desc:"Once SharePoint Lists replace Excel tables, build a Power Automate flow that automatically creates a Deal Pipeline record when a Property Research record is marked High or Medium priority. Eliminates manual promotion step. Build and test in test SharePoint environment.", tags:["deliverable","coding","RE"], est:"Month 2–3" },
       ]},
     ]
   },
@@ -173,7 +174,7 @@ const CURRICULUM = [
     phase: 1, phaseTitle: "Phase 2 — Application", phaseMeta: "Months 3–6 · Automate core workflows across all business areas",
     tracks: [
       { id:"T6", icon:"DA", name:"Deal Sourcing — Automation", milestones:[
-        { id:"m20", title:"Build the CoStar screening script", desc:"Python script reads CoStar CSV, applies physical criteria filters (50–200k SF, industrial/flex, occupancy thresholds, exclude self-storage/specialty), flags single-tenant and private owners as high priority, outputs scored shortlist to Excel.", tags:["deliverable","coding","RE"], est:"Month 3" },
+        { id:"m20", title:"Build the CoStar screening script", desc:"Python script reads the updated CoStar CSV export, applies hard filters (50–200k SF, industrial/flex, occupancy thresholds, exclude self-storage/specialty), uses ceiling height and power fields where available, infers missing fields via Claude API, flags single-tenant and private owners as high priority, logs all properties to Property Research Database, outputs scored shortlist to Deal Pipeline. Validated in test environment before production.", tags:["deliverable","coding","RE"], est:"Month 3" },
         { id:"m21", title:"Build the Stage 2 AI enrichment workflow", desc:"Python script passes each shortlisted property to Claude API: owner type classification (institutional REIT vs. private vs. operating company), tenant thesis fit flag (manufacturing/infrastructure/defense), outreach priority recommendation.", tags:["deliverable","coding","api","RE"], est:"Month 3–4" },
         { id:"m22", title:"Build AI investment memo first draft workflow", desc:"Prompt that takes structured deal data + thesis bullets and outputs a 10–15 page investment memo draft tailored to a specific investor. Reduces memo production from days to hours.", tags:["deliverable","RE","api"], est:"Month 4–5" },
         { id:"m23", title:"Run 10 real deals through the full automated workflow and refine", desc:"End-to-end: CoStar export → screening script → AI enrichment → thesis scoring → SharePoint List logging. Measure accuracy, tune prompts, validate owner data. Target: 80%+ field accuracy.", tags:["applied","RE"], est:"Month 5" },
@@ -218,7 +219,7 @@ const CURRICULUM = [
   }
 ];
 
-const COMPLETED_BY_DEFAULT = new Set(["m1","m2","m3","m4","m5a","m5","m9","m10"]);
+const COMPLETED_BY_DEFAULT = new Set(["m1","m2","m3","m4","m5a","m5","m9","m10","m16"]);
 const ALL_MILESTONES = CURRICULUM.flatMap(p => p.tracks.flatMap(t => t.milestones));
 const TOTAL = ALL_MILESTONES.length;
 
@@ -323,11 +324,15 @@ function saveNote(id) {
 function buildMilestone(m) {
   const done = !!state[m.id]?.done;
   const note = state[m.id]?.note || '';
+  const label = m.id.replace('m','M').replace('a','a');
   return `
     <div class="milestone ${done?'done':''}" id="ms-${m.id}" onclick="toggleMilestone('${m.id}')">
       <div class="milestone-check">${done?'✓':''}</div>
       <div class="milestone-body">
-        <div class="milestone-title" style="text-decoration:${done?'line-through':'none'}">${m.title}</div>
+        <div style="display:flex;align-items:baseline;gap:7px;">
+          <span style="font-family:monospace;font-size:0.58rem;color:#7a6430;flex-shrink:0;">${label.toUpperCase()}</span>
+          <div class="milestone-title" style="text-decoration:${done?'line-through':'none'}">${m.title}</div>
+        </div>
         <div class="milestone-desc">${m.desc}</div>
         <div class="milestone-tags">
           ${m.tags.map(t=>`<span class="tag ${tagClass(t)}">${t}</span>`).join('')}
